@@ -5,11 +5,10 @@ require './products/rockmelon'
 require './products/watermelon'
 require './products/pineapple'
 
-PRODUCTS = %w(Rockmelon Watermelon Pineapple)
 options = {}
 
 OptionParser.new do |parser|
-  products = PRODUCTS.map { |p| "#{p.downcase}s" }
+  products = %w(rockmelons watermelons pineapples)
 
   products.each do |product|
     parser.on("--#{product} COUNT", Integer, "Number of #{product} to purchase") do |val|
@@ -19,4 +18,4 @@ OptionParser.new do |parser|
 end.parse!
 
 order = Order.new options
-order.pack_order
+order.process
