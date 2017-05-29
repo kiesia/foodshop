@@ -8,6 +8,11 @@ class Order
     @subtotals = {}
   end
 
+  def process
+    pack_order
+    create_invoice
+  end
+
   def pack_order
     @order.each do |line_item|
       product, amount = line_item
@@ -29,9 +34,12 @@ class Order
   end
 
   def create_invoice
-    # @packed_order.keys.each do |key|
-      # product_total key
-    # end
+    calculate_subtotals
+    @packed_order.keys.each do |product|
+      puts product_summary(product)
+      puts pack_summary(product)
+    end
+    puts "TOTAL: #{format_money(calculate_total)}"
   end
 
   def calculate_subtotals
@@ -45,6 +53,10 @@ class Order
 
       @subtotals[product] = subtotal
     end
+  end
+
+  def calculate_total
+    @subtotals.values.reduce(0, :+)
   end
 
   def product_summary(product)

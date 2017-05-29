@@ -38,6 +38,7 @@ RSpec.describe Order do
       allow(Products::Watermelon).to receive(:packs).and_return({ 5 => 12.99 })
       order = Order.new(watermelons: 11)
       allow(order).to receive(:exit)
+      allow(order).to receive(:puts) # silence output
       expect(order).to receive(:exit).with(1)
       order.pack_order
     end
@@ -58,7 +59,9 @@ RSpec.describe Order do
 
     it "prints an error message when product count cannot fit package sizes" do
       order = Order.new(watermelons: 11)
-      expect { order.pack_product(:watermelons, 11) }.to output("Could not pack your Watermelons. Please ensure product count fits within pack sizes. Pack sizes: 3, 5\n").to_stdout
+      expect { order.pack_product(:watermelons, 11) }.to output(
+        "Could not pack your Watermelons. Please ensure product count fits within pack sizes. Pack sizes: 3, 5\n"
+      ).to_stdout
     end
   end
 
@@ -80,6 +83,15 @@ RSpec.describe Order do
       }
       order.calculate_subtotals
       expect(order.subtotals).to eq({ watermelons: 35.93, pineapples: 27.93 })
+    end
+  end
+
+  describe "#calculate_total" do
+    subject { Order.new(watermelons: 13, pineapples: 24) }
+
+    it "sums subtotals" do
+      subject.subtotals = { watermelons: 20.50, pineapples: 15.50 }
+      expect(subject.calculate_total).to eq 36
     end
   end
 
@@ -118,8 +130,42 @@ RSpec.describe Order do
     end
 
     it "displays a summary for each pack type purchased" do
-      expect(subject.pack_summary(:watermelons)).to match(/2 x 5 pack @ \$12.99/)
-      expect(subject.pack_summary(:watermelons)).to match(/1 x 3 pack @ \$9.95/)
+      expect(subject.pack_summary(:watermelons)).to match(
+        /2 x 5 pack @ \$12.99.*1 x 3 pack @ \$9.95/m
+      )
+    end
+  end
+
+  describe "#create_invoice" do
+    subject { Order.new(watermelons: 13, pineapples: 3) }
+
+    before do
+      allow(Products::Watermelon).to receive(:packs).and_return(
+        { 5 => 12.99, 3 => 9.95 }
+      )
+      allow(Products::Pineapple).to receive(:packs).and_return(
+        { 6 => 10.99, 3 => 5.95 }
+      )
+      subject.packed_order = {
+        watermelons: { 5 => 2, 3 => 1 },
+        pineapples: { 3 => 1 }
+      }
+    end
+
+    it "outputs product summary" do
+      expect { subject.create_invoice }.to output(/3 Pineapples \$5.95/).to_stdout
+    end
+
+    it"outputs pack summary" do
+      expect { subject.create_invoice }.to output(/ - 1 x 3 pack @ \$5.95/).to_stdout
+    end
+
+    it "outputs total" do
+      expect { subject.create_invoice }.to output(/TOTAL: \$41.88/).to_stdout
+    end
+
+    it "outputs summaries for all products" do
+      expect { subject.create_invoice }.to output(/Watermelons.*Pineapples/m).to_stdout
     end
   end
 end
