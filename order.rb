@@ -1,26 +1,65 @@
 class Order
-  attr_reader :order, :packed_order
+  attr_accessor :order, :packed_order, :subtotals
 
   def initialize(options = {})
     validate_options options
     @order = options
     @packed_order = {}
+    @subtotals = {}
   end
 
-  def pack_products
+  def pack_order
     @order.each do |line_item|
-      product, remainder = line_item
-      packs = get_product(product).packs
+      product, amount = line_item
+      pack_product product, amount
+    end
+    exit 1 if @has_incorrect_order_size
+  end
 
-      packs.keys.sort.reverse.each do |pack_size|
-        pack_count, remainder = remainder.divmod(pack_size)
+  def pack_product(product, remainder)
+    packs = get_product(product).packs
+    @packed_order[product] = {}
+
+    packs.keys.sort.reverse.each do |size|
+      pack_count, remainder = remainder.divmod(size)
+      @packed_order[product][size] = pack_count if pack_count > 0
+    end
+
+    incorrect_order_size(product) if remainder > 0
+  end
+
+  def create_invoice
+    # @packed_order.keys.each do |key|
+      # product_total key
+    # end
+  end
+
+  def calculate_subtotals
+    @packed_order.keys.each do |product|
+      subtotal = 0
+
+      @packed_order[product].each do |pack, quantity|
+        cost_per_pack = get_product(product).packs[pack]
+        subtotal = subtotal + (quantity * cost_per_pack)
       end
 
-      incorrect_order_size(product) if remainder > 0
+      @subtotals[product] = subtotal
     end
   end
 
+  def product_summary(product)
+    output = []
+    output << @order[product] # count
+    output << product.to_s.capitalize # name
+    output << format_money(@subtotals[product]) # subtotal
+    output.join(" ")
+  end
+
   private
+
+  def format_money(amount)
+    "$#{sprintf("%.2f", amount)}"
+  end
 
   # convert plural :products key into a classname
   # e.g. :watermelons >> Product::Watermelon
@@ -36,6 +75,7 @@ class Order
   end
 
   def incorrect_order_size(product)
+    @has_incorrect_order_size = true
     output = []
     output << "Could not pack your #{product.to_s.capitalize}."
     output << "Please ensure product count fits within pack sizes."
