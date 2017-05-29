@@ -1,5 +1,9 @@
 require 'optparse'
 require './order'
+require './products/product'
+require './products/rockmelon'
+require './products/watermelon'
+require './products/pineapple'
 
 PRODUCTS = %w(Rockmelon Watermelon Pineapple)
 options = {}
@@ -15,3 +19,4 @@ OptionParser.new do |parser|
 end.parse!
 
 order = Order.new options
+order.pack_order
