@@ -55,6 +55,17 @@ class Order
     output.join(" ")
   end
 
+  def pack_summary(product)
+    packs = get_product(product).packs
+    output = []
+
+    @packed_order[product].each do |pack, quantity|
+      output << " - #{quantity} x #{pack} pack @ #{format_money(packs[pack])}"
+    end
+
+    output.join("\n")
+  end
+
   private
 
   def format_money(amount)

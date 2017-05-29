@@ -106,4 +106,20 @@ RSpec.describe Order do
       expect(subject.product_summary(:watermelons)).to match(/\$35.93/)
     end
   end
+
+  describe "#pack_summary" do
+    subject { Order.new(watermelons: 13) }
+
+    before do
+      allow(Products::Watermelon).to receive(:packs).and_return(
+        { 5 => 12.99, 3 => 9.95 }
+      )
+      subject.packed_order = { watermelons: { 5 => 2, 3 => 1 }}
+    end
+
+    it "displays a summary for each pack type purchased" do
+      expect(subject.pack_summary(:watermelons)).to match(/2 x 5 pack @ \$12.99/)
+      expect(subject.pack_summary(:watermelons)).to match(/1 x 3 pack @ \$9.95/)
+    end
+  end
 end
