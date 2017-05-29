@@ -23,7 +23,7 @@ RSpec.describe Order do
 
     it "outputs help text when no options given" do
       allow_any_instance_of(Order).to receive(:exit)
-      expect { Order.new }.to output("Empty order, try -h for available options\n").to_stdout
+      expect { Order.new }.to output(/Empty order, try -h for available options/).to_stdout
     end
 
     it "outputs error text when an 0 is given as a product count" do
@@ -61,7 +61,7 @@ RSpec.describe Order do
     it "prints an error message when product count cannot fit package sizes" do
       order = Order.new(watermelons: 11)
       expect { order.pack_product(:watermelons, 11) }.to output(
-        "Could not pack your Watermelons. Please ensure product count fits within pack sizes. Pack sizes: 3, 5\n"
+        /Could not pack your Watermelons. Please ensure product count fits within pack sizes. Pack sizes: 3, 5/
       ).to_stdout
     end
   end
