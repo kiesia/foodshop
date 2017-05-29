@@ -7,6 +7,15 @@ require './products/pineapple'
 RSpec.describe Order do
   subject { Order.new(watermelons: 10, rockmelons: 10, pineapples: 10) }
 
+  before do
+    allow(Products::Watermelon).to receive(:packs).and_return(
+      { 3 => 9.95, 5 => 12.99 }
+    )
+    allow(Products::Pineapple).to receive(:packs).and_return(
+      { 6 => 10.99, 3 => 5.95 }
+    )
+  end
+
   describe "#initialize" do
     it "assigns @order" do
       expect(subject).to have_attributes(order: { watermelons: 10, rockmelons: 10, pineapples: 10 })
@@ -20,12 +29,6 @@ RSpec.describe Order do
 
   describe "#pack_order" do
     it "packs each product into packages" do
-      allow(Products::Watermelon).to receive(:packs).and_return(
-        { 5 => 12.99, 3 => 9.95 }
-      )
-      allow(Products::Pineapple).to receive(:packs).and_return(
-        { 6 => 12.99, 3 => 9.95 }
-      )
       order = Order.new(watermelons: 13, pineapples: 15)
       order.pack_order
       expect(order.packed_order).to eq({
@@ -35,7 +38,6 @@ RSpec.describe Order do
     end
 
     it "exits with an error state when there are incorrect order sizes" do
-      allow(Products::Watermelon).to receive(:packs).and_return({ 5 => 12.99 })
       order = Order.new(watermelons: 11)
       allow(order).to receive(:exit)
       allow(order).to receive(:puts) # silence output
@@ -45,12 +47,6 @@ RSpec.describe Order do
   end
 
   describe "#pack_product" do
-    before do
-      allow(Products::Watermelon).to receive(:packs).and_return(
-        { 3 => 9.95, 5 => 12.99 }
-      )
-    end
-
     it "divides a product amount into packs, with largest packs taking precedence" do
       order = Order.new(watermelons: 13)
       order.pack_product(:watermelons, 13)
@@ -66,15 +62,6 @@ RSpec.describe Order do
   end
 
   describe "#calculate_subtotals" do
-    before do
-      allow(Products::Watermelon).to receive(:packs).and_return(
-        { 5 => 12.99, 3 => 9.95 }
-      )
-      allow(Products::Pineapple).to receive(:packs).and_return(
-        { 6 => 10.99, 3 => 5.95 }
-      )
-    end
-
     it "calculates subtotals on all products" do
       order = Order.new(watermelons: 13, pineapples: 15)
       order.packed_order = {
@@ -99,9 +86,6 @@ RSpec.describe Order do
     subject { Order.new(watermelons: 13) }
 
     before do
-      allow(Products::Watermelon).to receive(:packs).and_return(
-        { 3 => 9.95, 5 => 12.99 }
-      )
       subject.packed_order = { watermelons: { 5 => 2, 3 => 1 }}
       subject.calculate_subtotals
     end
@@ -123,9 +107,6 @@ RSpec.describe Order do
     subject { Order.new(watermelons: 13) }
 
     before do
-      allow(Products::Watermelon).to receive(:packs).and_return(
-        { 5 => 12.99, 3 => 9.95 }
-      )
       subject.packed_order = { watermelons: { 5 => 2, 3 => 1 }}
     end
 
@@ -140,12 +121,6 @@ RSpec.describe Order do
     subject { Order.new(watermelons: 13, pineapples: 3) }
 
     before do
-      allow(Products::Watermelon).to receive(:packs).and_return(
-        { 5 => 12.99, 3 => 9.95 }
-      )
-      allow(Products::Pineapple).to receive(:packs).and_return(
-        { 6 => 10.99, 3 => 5.95 }
-      )
       subject.packed_order = {
         watermelons: { 5 => 2, 3 => 1 },
         pineapples: { 3 => 1 }
