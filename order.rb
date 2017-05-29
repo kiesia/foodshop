@@ -2,7 +2,7 @@ class Order
   attr_accessor :order, :packed_order, :subtotals
 
   def initialize(options = {})
-    validate_options options
+    validate! options
     @order = options
     @packed_order = {}
     @subtotals = {}
@@ -90,9 +90,21 @@ class Order
     Products.const_get(product[0...-1].capitalize)
   end
 
-  def validate_options(options)
+  def validate!(options)
+    validate_presence options
+    validate_count options
+  end
+
+  def validate_presence(options)
     if options.empty?
       puts "Empty order, try -h for available options"
+      exit 1
+    end
+  end
+
+  def validate_count(options)
+    if options.values.include? 0
+      puts "Please enter a number greater than 0"
       exit 1
     end
   end
