@@ -20,7 +20,8 @@ class Order
     end
     exit 1 if @has_incorrect_order_size
   end
-
+  
+  # placeholder code, don't judge me ;-)
   def pack_product(product, remainder)
     packs = get_product(product).packs
     @packed_order[product] = {}
