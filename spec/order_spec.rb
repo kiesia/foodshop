@@ -39,9 +39,9 @@ RSpec.describe Order do
     it "packs each product into packages" do
       allow(packer).to receive(:pack).and_return([1, 2])
 
-      order = Order.new(watermelons: 13, pineapples: 15)
-      order.pack_order
-      expect(order.packed_order).to eq({
+      subject = Order.new(watermelons: 13, pineapples: 15)
+      subject.pack_order
+      expect(subject.packed_order).to eq({
         watermelons: { 5 => 2, 3 => 1 },
         pineapples: { 6 => 1, 3 => 2 }
       })
@@ -50,11 +50,11 @@ RSpec.describe Order do
     it "exits with an error state when there are incorrect order sizes" do
       allow(packer).to receive(:pack).and_return(false)
 
-      order = Order.new(watermelons: 1)
-      allow(order).to receive(:exit)
-      allow(order).to receive(:puts) # silence output
-      expect(order).to receive(:exit).with(1)
-      order.pack_order
+      subject = Order.new(watermelons: 1)
+      allow(subject).to receive(:exit)
+      allow(subject).to receive(:puts) # silence output
+      expect(subject).to receive(:exit).with(1)
+      subject.pack_order
     end
   end
 
@@ -68,16 +68,16 @@ RSpec.describe Order do
     it "divides a product amount into packs" do
       allow(packer).to receive(:pack).and_return([1, 2])
 
-      order = Order.new(watermelons: 13)
-      order.pack_product(:watermelons, 13)
-      expect(order.packed_order).to eq({ watermelons: { 5 => 2, 3 => 1 }})
+      subject = Order.new(watermelons: 13)
+      subject.pack_product(:watermelons, 13)
+      expect(subject.packed_order).to eq({ watermelons: { 5 => 2, 3 => 1 }})
     end
 
     it "prints an error message when product count cannot fit package sizes" do
       allow(packer).to receive(:pack).and_return(false)
 
-      order = Order.new(watermelons: 1)
-      expect { order.pack_product(:watermelons, 1) }.to output(
+      subject = Order.new(watermelons: 1)
+      expect { subject.pack_product(:watermelons, 1) }.to output(
         /Could not pack your Watermelons. Please ensure product count fits within pack sizes: 3, 5/
       ).to_stdout
     end
@@ -85,13 +85,13 @@ RSpec.describe Order do
 
   describe "#calculate_subtotals" do
     it "calculates subtotals on all products" do
-      order = Order.new(watermelons: 13, pineapples: 15)
-      order.packed_order = {
+      subject = Order.new(watermelons: 13, pineapples: 15)
+      subject.packed_order = {
         watermelons: { 5 => 2, 3 => 1 },
         pineapples:  { 6 => 2, 3 => 1 }
       }
-      order.calculate_subtotals
-      expect(order.subtotals).to eq({ watermelons: 35.93, pineapples: 27.93 })
+      subject.calculate_subtotals
+      expect(subject.subtotals).to eq({ watermelons: 35.93, pineapples: 27.93 })
     end
   end
 
