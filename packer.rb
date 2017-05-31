@@ -1,6 +1,7 @@
 class Packer
   attr_reader :packs, :amount, :pack_limits, :position
 
+  # Requires a hash of packs { pack_size => pack_price } and an order total
   def initialize(options = {})
     if options[:packs].nil? || options[:amount].nil?
       raise ArgumentError
@@ -12,6 +13,10 @@ class Packer
     @position = Array.new(@packs.length, 0)
   end
 
+  ##
+  # Main packing method. Increment over all packing solutions. If we find one
+  # that matches our order amount, check to see if this is smaller than the
+  # existing solution. In the case of a tie on size, go with the cheapest option
   def pack
     while @position != @pack_limits
       increment @position.length
@@ -31,6 +36,9 @@ class Packer
     @solution ||= false
   end
 
+  ##
+  # Increments the @position array, which will then give us a new potential
+  # solution. Ensures we will not exceed our packing limits.
   def increment(n)
     return if @position == @pack_limits
 
