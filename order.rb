@@ -1,5 +1,3 @@
-require 'pry'
-
 class Order
   attr_accessor :order, :packed_order, :subtotals
 

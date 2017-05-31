@@ -1,5 +1,3 @@
-require 'pry'
-
 class Packer
   attr_reader :packs, :amount, :pack_limits, :position
 
