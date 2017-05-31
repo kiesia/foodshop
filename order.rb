@@ -1,3 +1,5 @@
+require 'pry'
+
 class Order
   attr_accessor :order, :packed_order, :subtotals
 
@@ -21,16 +23,16 @@ class Order
     exit 1 if @has_incorrect_order_size
   end
 
-  def pack_product(product, remainder)
+  def pack_product(product, amount)
     packs = get_product(product).packs
-    @packed_order[product] = {}
+    packer = Packer.new(packs: packs, amount: amount)
+    solution = packer.pack
 
-    packs.keys.sort.reverse.each do |size|
-      pack_count, remainder = remainder.divmod(size)
-      @packed_order[product][size] = pack_count if pack_count > 0
+    if solution
+      @packed_order[product] = packs.keys.zip(solution).to_h
+    else
+      incorrect_order_size(product)
     end
-
-    incorrect_order_size(product) if remainder > 0
   end
 
   def create_invoice
@@ -72,7 +74,9 @@ class Order
     output = []
 
     @packed_order[product].each do |pack, quantity|
-      output << " - #{quantity} x #{pack} pack @ #{format_money(packs[pack])}"
+      if quantity > 0
+        output << " - #{quantity} x #{pack} pack @ #{format_money(packs[pack])}"
+      end
     end
 
     output.join("\n")
@@ -113,8 +117,8 @@ class Order
     @has_incorrect_order_size = true
     output = []
     output << "Could not pack your #{product.to_s.capitalize}."
-    output << "Please ensure product count fits within pack sizes."
-    output << "Pack sizes: #{get_product(product).packs.keys.join(", ")}"
+    output << "Please ensure product count fits within pack sizes:"
+    output << get_product(product).packs.keys.join(", ")
     puts output.join(" ")
   end
 end
