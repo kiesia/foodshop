@@ -1,5 +1,6 @@
 require 'spec_helper'
 require './order'
+require './packer'
 require './products/product'
 require './products/watermelon'
 require './products/pineapple'
@@ -43,7 +44,7 @@ RSpec.describe Order do
     end
 
     it "exits with an error state when there are incorrect order sizes" do
-      order = Order.new(watermelons: 11)
+      order = Order.new(watermelons: 1)
       allow(order).to receive(:exit)
       allow(order).to receive(:puts) # silence output
       expect(order).to receive(:exit).with(1)
@@ -52,16 +53,16 @@ RSpec.describe Order do
   end
 
   describe "#pack_product" do
-    it "divides a product amount into packs, with largest packs taking precedence" do
+    it "divides a product amount into packs" do
       order = Order.new(watermelons: 13)
       order.pack_product(:watermelons, 13)
       expect(order.packed_order).to eq({ watermelons: { 5 => 2, 3 => 1 }})
     end
 
     it "prints an error message when product count cannot fit package sizes" do
-      order = Order.new(watermelons: 11)
-      expect { order.pack_product(:watermelons, 11) }.to output(
-        /Could not pack your Watermelons. Please ensure product count fits within pack sizes. Pack sizes: 3, 5/
+      order = Order.new(watermelons: 1)
+      expect { order.pack_product(:watermelons, 1) }.to output(
+        /Could not pack your Watermelons. Please ensure product count fits within pack sizes: 3, 5/
       ).to_stdout
     end
   end
