@@ -50,7 +50,6 @@ RSpec.describe Order do
     it "exits with an error state when there are incorrect order sizes" do
       allow(packer).to receive(:pack).and_return(false)
 
-      subject = Order.new(watermelons: 1)
       allow(subject).to receive(:exit)
       allow(subject).to receive(:puts) # silence output
       expect(subject).to receive(:exit).with(1)
@@ -68,7 +67,6 @@ RSpec.describe Order do
     it "divides a product amount into packs" do
       allow(packer).to receive(:pack).and_return([1, 2])
 
-      subject = Order.new(watermelons: 13)
       subject.pack_product(:watermelons, 13)
       expect(subject.packed_order).to eq({ watermelons: { 5 => 2, 3 => 1 }})
     end
@@ -76,7 +74,6 @@ RSpec.describe Order do
     it "prints an error message when product count cannot fit package sizes" do
       allow(packer).to receive(:pack).and_return(false)
 
-      subject = Order.new(watermelons: 1)
       expect { subject.pack_product(:watermelons, 1) }.to output(
         /Could not pack your Watermelons. Please ensure product count fits within pack sizes: 3, 5/
       ).to_stdout
