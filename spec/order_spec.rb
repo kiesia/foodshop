@@ -1,9 +1,5 @@
 require 'spec_helper'
 require './order'
-require './packer'
-require './products/product'
-require './products/watermelon'
-require './products/pineapple'
 
 RSpec.describe Order do
   subject { Order.new(watermelons: 10, rockmelons: 10, pineapples: 10) }
@@ -34,16 +30,26 @@ RSpec.describe Order do
   end
 
   describe "#pack_order" do
+    let(:packer) { instance_double("Packer") }
+
+    before do
+      allow(Packer).to receive(:new).and_return(packer)
+    end
+
     it "packs each product into packages" do
+      allow(packer).to receive(:pack).and_return([1, 2])
+
       order = Order.new(watermelons: 13, pineapples: 15)
       order.pack_order
       expect(order.packed_order).to eq({
         watermelons: { 5 => 2, 3 => 1 },
-        pineapples: { 6 => 2, 3 => 1 }
+        pineapples: { 6 => 1, 3 => 2 }
       })
     end
 
     it "exits with an error state when there are incorrect order sizes" do
+      allow(packer).to receive(:pack).and_return(false)
+
       order = Order.new(watermelons: 1)
       allow(order).to receive(:exit)
       allow(order).to receive(:puts) # silence output
@@ -53,13 +59,23 @@ RSpec.describe Order do
   end
 
   describe "#pack_product" do
+    let(:packer) { instance_double("Packer") }
+
+    before do
+      allow(Packer).to receive(:new).and_return(packer)
+    end
+
     it "divides a product amount into packs" do
+      allow(packer).to receive(:pack).and_return([1, 2])
+
       order = Order.new(watermelons: 13)
       order.pack_product(:watermelons, 13)
       expect(order.packed_order).to eq({ watermelons: { 5 => 2, 3 => 1 }})
     end
 
     it "prints an error message when product count cannot fit package sizes" do
+      allow(packer).to receive(:pack).and_return(false)
+
       order = Order.new(watermelons: 1)
       expect { order.pack_product(:watermelons, 1) }.to output(
         /Could not pack your Watermelons. Please ensure product count fits within pack sizes: 3, 5/
