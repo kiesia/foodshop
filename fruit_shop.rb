@@ -1,5 +1,6 @@
 require 'optparse'
 require './order'
+require './packer'
 require './products/product'
 require './products/rockmelon'
 require './products/watermelon'
