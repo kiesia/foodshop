@@ -16,6 +16,9 @@ RSpec.describe Order do
     allow(Products::Pineapple).to receive(:packs).and_return(
       { 6 => 10.99, 3 => 5.95 }
     )
+    allow(Products::Rockmelon).to receive(:packs).and_return(
+      { 6 => 10.99, 3 => 5.95 }
+    )
   end
 
   describe "#initialize" do
