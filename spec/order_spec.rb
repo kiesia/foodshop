@@ -1,5 +1,10 @@
 require 'spec_helper'
 require './order'
+require './packer'
+require './products/product'
+require './products/watermelon'
+require './products/pineapple'
+require './products/rockmelon'
 
 RSpec.describe Order do
   subject { Order.new(watermelons: 10, rockmelons: 10, pineapples: 10) }
@@ -37,7 +42,7 @@ RSpec.describe Order do
     end
 
     it "packs each product into packages" do
-      allow(packer).to receive(:pack).and_return([1, 2])
+      allow(packer).to receive(:pack).and_return({ 5 => 2, 3 => 1 }, { 6 => 1, 3 => 2 })
 
       subject = Order.new(watermelons: 13, pineapples: 15)
       subject.pack_order
@@ -65,7 +70,7 @@ RSpec.describe Order do
     end
 
     it "divides a product amount into packs" do
-      allow(packer).to receive(:pack).and_return([1, 2])
+      allow(packer).to receive(:pack).and_return({ 5 => 2, 3 => 1 })
 
       subject.pack_product(:watermelons, 13)
       expect(subject.packed_order).to eq({ watermelons: { 5 => 2, 3 => 1 }})

@@ -33,7 +33,7 @@ class Packer
       end
     end
 
-    @solution ||= false
+    (@solution != nil) ? @packs.keys.zip(@solution).to_h : false
   end
 
   ##

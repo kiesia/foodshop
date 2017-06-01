@@ -28,12 +28,12 @@ RSpec.describe Packer do
 
   describe "#pack" do
     it "returns the smallest packing solution" do
-      expect(subject.pack).to eq [0, 1, 2]
+      expect(subject.pack).to eq({ 5 => 0,  12 => 1,  4 => 2 })
     end
 
     it "returns the cheapest solution when two solutions of equal size exist" do
       subject = Packer.new(packs: { 3 => 5.95, 5 => 9.95, 9 => 16.99 }, amount: 33)
-      expect(subject.pack).to eq [2,0,3]
+      expect(subject.pack).to eq({ 3 => 2, 5 => 0, 9 => 3 })
     end
 
     it "returns false when no packing solution can be found" do
