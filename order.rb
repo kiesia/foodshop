@@ -27,7 +27,6 @@ class Order
     solution = packer.pack
 
     if solution
-      # @packed_order[product] = packs.keys.zip(solution).to_h
       @packed_order[product] = solution
     else
       incorrect_order_size(product)
