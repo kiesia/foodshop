@@ -31,7 +31,7 @@ RSpec.describe Order do
       expect { Order.new }.to output(/Empty order, try -h for available options/).to_stdout
     end
 
-    it "outputs error text when an 0 is given as a product count" do
+    it "outputs error text when product count is less than 1" do
       allow_any_instance_of(Order).to receive(:exit)
       expect { Order.new(watermelons: 0) }.to output(/Please enter a number greater than 0/).to_stdout
     end
