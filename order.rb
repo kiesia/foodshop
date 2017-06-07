@@ -105,9 +105,11 @@ class Order
   end
 
   def validate_count(options)
-    if options.values.include? 0
-      puts "Please enter a number greater than 0"
-      exit 1
+    options.values.each do |option|
+      if (option < 1)
+        puts "Please enter a number greater than 0"
+        exit 1
+      end
     end
   end
 
