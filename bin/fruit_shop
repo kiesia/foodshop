@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require_relative '../order'
+require_relative '../packer'
+require_relative '../products/product'
+require_relative '../products/rockmelon'
+require_relative '../products/watermelon'
+require_relative '../products/pineapple'
+
+options = {}
+
+OptionParser.new do |parser|
+  products = %w(rockmelons watermelons pineapples)
+
+  products.each do |product|
+    parser.on("--#{product} COUNT", Integer, "Number of #{product} to purchase") do |val|
+      options[product.to_sym] = val
+    end
+  end
+end.parse!
+
+order = Order.new options
+order.process
