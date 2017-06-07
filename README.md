@@ -1,6 +1,7 @@
 # Welcome to the Fruitshop
 
-To order, clone this repository and execute `ruby fruit_shop.rb -h` in your terminal to see available options.
+To order, clone this repository and execute `bin/fruit_shop -h` in your terminal
+to see available options.
 
 We currently sell the following products:
 
